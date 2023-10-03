@@ -9,18 +9,20 @@ driver = get_driver()
 
 
 class Config(BaseModel, extra=Extra.ignore):
-    blockwords: List[str] = []
-    blockwords_file: Union[str, List[str]] = []
-    blockwords_status: bool = True
-    blockwords_priority = 0
-    blockword_replace: Optional[str] = None
-    blockword_use_jieba: bool = True
+    blockwords: List[str] = []  # env中自定义屏蔽词
+    blockwords_file: Union[str, List[str]] = []  # 屏蔽词文件路径
+    blockwords_priority = 0  # 屏蔽词检查优先级
+    blockwords_replace: Optional[str] = None  # 屏蔽词替换字符，不填写时触发屏蔽词时机器人将会不发送消息
+    blockwords_use_jieba: bool = True  # 使用jieba分词的方式检查是否触发屏蔽词
+    blockwords_bot: bool = True  # 检查机器人发送的消息
+    blockwords_user: bool = False  # 检查用户发送的消息
+    blockwords_stop_propagation: bool = True  # 用户触发屏蔽词后是否向继续向下传递
 
 
 __plugin_meta__ = PluginMetadata(
     name="nonebot_plugin_blockwords",
     description="接收的消息或机器人发送的消息进行屏蔽词检查",
-    usage="",
+    usage="屏蔽词开关：屏蔽词 开启/关闭\n",
     config=Config,
 )
 

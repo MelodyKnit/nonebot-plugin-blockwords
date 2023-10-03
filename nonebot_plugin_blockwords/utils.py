@@ -1,23 +1,10 @@
 import json
+from typing import List
 from pathlib import Path
-from typing import List, Union, Callable
 
 from nonebot.log import logger
-from nonebot.adapters import Message, MessageSegment
 
 from .config import plugin_config, default_blockwords_dir
-
-
-def message_liter(message: Union[str, "Message", "MessageSegment"]):
-    def _(func: Callable[[str], str]):
-        if isinstance(message, str):
-            func(message)
-        elif isinstance(message, Message):
-            for msg in message:
-                if isinstance(msg, MessageSegment) and msg.is_text():
-                    func(msg.get_message_class()(msg).extract_plain_text())
-
-    return _
 
 
 def get_blockword() -> List[str]:
