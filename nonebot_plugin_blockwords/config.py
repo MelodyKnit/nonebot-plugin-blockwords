@@ -19,13 +19,6 @@ class Config(BaseModel, extra=Extra.ignore):
     blockwords_stop_propagation: bool = True  # 用户触发屏蔽词后是否向继续向下传递
 
 
-__plugin_meta__ = PluginMetadata(
-    name="nonebot_plugin_blockwords",
-    description="接收的消息或机器人发送的消息进行屏蔽词检查",
-    usage="屏蔽词开关：屏蔽词 开启/关闭\n",
-    config=Config,
-)
-
 plugin_config = Config.parse_obj(driver.config.dict())
-data_dir = get_data_dir(__plugin_meta__.name)
+data_dir = get_data_dir("nonebot-plugin-blockwords")
 default_blockwords_dir = data_dir / "blockwords"

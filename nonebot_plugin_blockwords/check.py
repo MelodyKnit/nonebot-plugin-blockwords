@@ -1,3 +1,5 @@
+import re
+from functools import partial
 from typing import List, Union, Iterable
 
 from jieba import cut
@@ -6,6 +8,14 @@ from .utils import get_blockword
 from .config import plugin_config
 
 blockwords = get_blockword()
+pattern = "|".join(re.escape(w) for w in blockwords)
+regex = re.compile(rf"(?:{pattern})")
+
+
+def replace_text(text: str) -> str:
+    if plugin_config.blockwords_replace is None:
+        raise ValueError("缺少`blockwords_replace`配置项")
+    return plugin_config.blockwords_replace * len(text)
 
 
 def find_blockword(text: Union[str, Iterable[str]]) -> List[str]:
@@ -19,8 +29,8 @@ def find_blockword(text: Union[str, Iterable[str]]) -> List[str]:
     """
     if isinstance(text, str):
         if not plugin_config.blockwords_use_jieba:
-            return [i for i in blockwords if i in text]
-        text = cut(text)
+            return regex.findall(text)
+        text = cut(text, cut_all=False)
     return list(set(text) & set(blockwords))
 
 
@@ -35,11 +45,7 @@ def blockword_exists(text: str) -> bool:
     """
     if plugin_config.blockwords_use_jieba:
         return bool(find_blockword(text))
-    else:
-        for word in blockwords:
-            if word in text:
-                return True
-    return False
+    return bool(regex.search(text))
 
 
 def blockword_replace(text: str) -> str:
@@ -54,13 +60,10 @@ def blockword_replace(text: str) -> str:
     if plugin_config.blockwords_replace is None:
         raise ValueError("缺少`blockwords_replace`配置项")
     if plugin_config.blockwords_use_jieba:
-        word_segmentation = list(cut(text))
+        word_segmentation = list(cut(text, cut_all=False))
         if word := find_blockword(word_segmentation):
-            for i, w in enumerate(word_segmentation):
+            for i, w in enumerate(word_segmentation):  # 使用jieba分词后，替换屏蔽词
                 if w in word:
-                    word_segmentation[i] = plugin_config.blockwords_replace * len(w)
+                    word_segmentation[i] = replace_text(w)
         return "".join(word_segmentation)
-    else:
-        for word in find_blockword(text):
-            text = text.replace(word, plugin_config.blockwords_replace * len(word))
-    return text
+    return regex.sub(lambda m: replace_text(m.group(0)), text)  # type: ignore

@@ -3,14 +3,14 @@ from typing import Any, Type, Union
 
 from nonebot.log import logger
 from nonebot.permission import SUPERUSER
+from nonebot.plugin import PluginMetadata
 from nonebot import on_command, on_message
 from nonebot.internal.matcher import Matcher
 from nonebot.adapters import Bot, Event, Message, MessageSegment
 from nonebot.params import CommandArg, CommandStart, EventPlainText
 
-from .params import FIND_BLOCKWORD
-from .config import driver, plugin_config, __plugin_meta__
-from .check import find_blockword, blockword_exists, blockword_replace
+from .config import Config, driver, plugin_config
+from .check import blockword_exists, blockword_replace
 
 blockwords_matcher = on_message(block=False, priority=plugin_config.blockwords_priority)
 blockwords_status = on_command(
@@ -104,11 +104,12 @@ async def _(bot: Bot):
     bot.send = partial(send_hook, bot.send)
 
 
-__all__ = [
-    "__plugin_meta__",
-    "blockwords_matcher",
-    "blockword_exists",
-    "blockword_replace",
-    "find_blockword",
-    "FIND_BLOCKWORD",
-]
+__plugin_meta__ = PluginMetadata(
+    name="屏蔽词插件",
+    description="接收的消息或机器人发送的消息进行屏蔽词检查",
+    usage="屏蔽词开关：屏蔽词 开启/关闭\n",
+    type="application",
+    config=Config,
+    homepage="https://github.com/MelodyKnit/nonebot-plugin-blockwords",
+    supported_adapters=None,
+)

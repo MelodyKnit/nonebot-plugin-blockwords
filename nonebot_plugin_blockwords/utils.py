@@ -23,7 +23,7 @@ def get_blockword() -> List[str]:
         for file_path in plugin_config.blockwords_file:
             words.extend(read_words(Path(file_path)))
             logger.success(f"读取屏蔽词文件 << {file_path}")
-    else:
+    elif default_blockwords_dir.exists():
         for file_path in default_blockwords_dir.iterdir():
             words.extend(read_words(file_path))
             logger.success(f"读取屏蔽词文件 << {file_path}")
