@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-blockwords"
-version = "0.1.0"
+version = "0.1.1"
 description = "nonebot聊天屏蔽词插件"
 authors = ["MelodyKnit <2711402357@qq.com>"]
 license = "MIT"
