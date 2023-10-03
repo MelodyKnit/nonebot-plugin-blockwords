@@ -1,8 +1,9 @@
-from pathlib import Path
-from nonebot.log import logger
 import json
+from pathlib import Path
+from typing import List, Union, Callable
+
+from nonebot.log import logger
 from nonebot.adapters import Message, MessageSegment
-from typing import Callable, List, Union
 
 from .config import plugin_config, default_blockwords_dir
 
@@ -15,7 +16,7 @@ def message_liter(message: Union[str, "Message", "MessageSegment"]):
             for msg in message:
                 if isinstance(msg, MessageSegment) and msg.is_text():
                     func(msg.get_message_class()(msg).extract_plain_text())
-        
+
     return _
 
 
@@ -39,8 +40,8 @@ def get_blockword() -> List[str]:
         for file_path in default_blockwords_dir.iterdir():
             words.extend(read_words(file_path))
             logger.success(f"读取屏蔽词文件 << {file_path}")
-    words = list(set(words))
-    words.sort(key=len, reverse=True)
+    words = list(set(words))  # 去重
+    words.sort(key=len, reverse=True)  # 按长度排序
     return words
 
 

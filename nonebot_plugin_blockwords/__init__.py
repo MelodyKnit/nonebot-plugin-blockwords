@@ -1,13 +1,14 @@
-from nonebot import on_command, on_message
+from functools import partial
+from typing import Any, Type, Union
+
 from nonebot.log import logger
 from nonebot.params import CommandArg
-from nonebot.adapters import Message, Bot, Event, MessageSegment
 from nonebot.permission import SUPERUSER
-from functools import partial
-from typing import Type, Union, Any
-from .config import plugin_config, driver
-from .check import blockword_replace, blockword_exists
+from nonebot import on_command, on_message
+from nonebot.adapters import Bot, Event, Message, MessageSegment
 
+from .config import driver, plugin_config
+from .check import blockword_exists, blockword_replace
 
 blockwords = on_message(block=False, priority=plugin_config.blockwords_priority)
 blockwords_status = on_command(

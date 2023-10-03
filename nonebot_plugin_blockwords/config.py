@@ -1,6 +1,7 @@
-from typing import List, Optional, Union
-from pydantic import BaseModel, Extra
+from typing import List, Union, Optional
+
 from nonebot import get_driver
+from pydantic import Extra, BaseModel
 from nonebot.plugin import PluginMetadata
 from nonebot_plugin_localstore import get_data_dir
 
@@ -13,6 +14,7 @@ class Config(BaseModel, extra=Extra.ignore):
     blockwords_status: bool = True
     blockwords_priority = 0
     blockword_replace: Optional[str] = None
+    blockword_use_jieba: bool = True
 
 
 __plugin_meta__ = PluginMetadata(
