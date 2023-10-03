@@ -22,9 +22,11 @@ python = "^3.8"
 nonebot2 = "^2.1.1"
 nonebot-plugin-localstore = "^0.5.1"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.group.dev.dependencies]
+isort = "^5.10.1"
+black = "^23.1.0"
+pre-commit = "^3.0.0"
+ruff = ">=0.0.272,<1.0.0"
 
 [tool.black]
 line-length = 88
@@ -57,8 +59,9 @@ mark-parentheses = false
 pythonVersion = "3.8"
 pythonPlatform = "All"
 executionEnvironments = [
-    { root = "./tests", extraPaths = [
-        "./",
-    ] },
     { root = "./" },
 ]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
