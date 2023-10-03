@@ -29,7 +29,7 @@ blockwords_file=["blockwords1.txt", "blockwords2.txt"]
 
 接下来我们将使用`console`进行演示，我会将屏蔽词都写入到一个`blockwords.txt`的文件下，并且只开启`blockwords_bot`
 
-![image-20231003153146954](README.assets\image-20231003153146954.png)
+![image-20231003153146954](README.assets/image-20231003153146954.png)
 
 是不是觉得很有趣，当然，你如果希望机器人发送的消息屏蔽词转成特定的字符，你可以使用`blockwords_replace`配置项，以下是`blockwords_replace`配置项使用例子。
 
@@ -37,7 +37,7 @@ blockwords_file=["blockwords1.txt", "blockwords2.txt"]
 BLOCKWORDS_REPLACE="*"	# 将屏蔽词替换为*
 ```
 
-![image-20231003154251844](README.assets\image-20231003154251844.png)
+![image-20231003154251844](README.assets/image-20231003154251844.png)
 
 ### 尝试使用`blockwords_user`配置
 
