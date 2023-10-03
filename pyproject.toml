@@ -16,7 +16,6 @@ packages = [{ include = "nonebot_plugin_blockwords" }]
 [tool.poetry.dependencies]
 python = "^3.8"
 nonebot2 = "^2.1.1"
-nonebot-plugin-localstore = "^0.5.1"
 jieba = "^0.42.1"
 
 [tool.poetry.group.dev.dependencies]

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from nonebot.log import logger
 
-from .config import plugin_config, default_blockwords_dir
+from .config import plugin_config
 
 
 def get_blockword() -> List[str]:
@@ -22,10 +22,6 @@ def get_blockword() -> List[str]:
     elif isinstance(plugin_config.blockwords_file, list):
         for file_path in plugin_config.blockwords_file:
             words.extend(read_words(Path(file_path)))
-            logger.success(f"读取屏蔽词文件 << {file_path}")
-    elif default_blockwords_dir.exists():
-        for file_path in default_blockwords_dir.iterdir():
-            words.extend(read_words(file_path))
             logger.success(f"读取屏蔽词文件 << {file_path}")
     words = list(set(words))  # 去重
     words.sort(key=len, reverse=True)  # 按长度排序

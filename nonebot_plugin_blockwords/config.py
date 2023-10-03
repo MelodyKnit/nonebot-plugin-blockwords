@@ -2,8 +2,6 @@ from typing import List, Union, Optional
 
 from nonebot import get_driver
 from pydantic import Extra, BaseModel
-from nonebot.plugin import PluginMetadata
-from nonebot_plugin_localstore import get_data_dir
 
 driver = get_driver()
 
@@ -20,5 +18,3 @@ class Config(BaseModel, extra=Extra.ignore):
 
 
 plugin_config = Config.parse_obj(driver.config.dict())
-data_dir = get_data_dir("nonebot-plugin-blockwords")
-default_blockwords_dir = data_dir / "blockwords"
