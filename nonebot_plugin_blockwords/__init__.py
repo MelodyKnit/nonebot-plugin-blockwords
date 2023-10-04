@@ -1,25 +1,15 @@
 from functools import partial
-from typing import Any, Type, Union
 
 from nonebot.log import logger
-from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
-from nonebot import on_command, on_message
 from nonebot.internal.matcher import Matcher
-from nonebot.adapters import Bot, Event, Message, MessageSegment
+from nonebot.adapters import Bot, Event, Message
 from nonebot.params import CommandArg, CommandStart, EventPlainText
 
+from .hook import send_hook
+from .check import blockword_exists
 from .config import Config, driver, plugin_config
-from .check import blockword_exists, blockword_replace
-
-blockwords_matcher = on_message(block=False, priority=plugin_config.blockwords_priority)
-blockwords_status = on_command(
-    "屏蔽词",
-    aliases={"用户屏蔽词", "机器人屏蔽词"},
-    block=True,
-    priority=plugin_config.blockwords_priority,
-    permission=SUPERUSER,
-)
+from .matcher import blockwords_status, blockwords_matcher
 
 
 @blockwords_matcher.handle()
@@ -39,64 +29,14 @@ async def _(
 
 @blockwords_status.handle()
 async def _(matcher: Matcher, msg: Message = CommandArg(), start: str = CommandStart()):
-    txt = msg.extract_plain_text()
-    if start.startswith("用户"):
-        if txt == "开启":
-            plugin_config.blockwords_user = True
-            await matcher.finish("用户屏蔽词开启")
-        elif txt == "关闭":
-            plugin_config.blockwords_user = False
-            await matcher.finish("用户屏蔽词关闭")
+    txt = msg.extract_plain_text().strip()
+    if (status := txt == "开启" if txt in ["开启", "关闭"] else None) is not None:
+        if start.startswith("用户"):
+            plugin_config.blockwords_user = status
+            await matcher.finish(f"用户屏蔽词{txt}")
         else:
-            await matcher.finish("用户屏蔽词开关：屏蔽词 开启/关闭\n")
-    else:
-        if txt == "开启":
-            plugin_config.blockwords_bot = True
-            await matcher.finish("机器人屏蔽词开启")
-        elif txt == "关闭":
-            plugin_config.blockwords_bot = False
-            await matcher.finish("机器人屏蔽词关闭")
-
-
-async def send_hook(
-    send,
-    event: "Event",
-    message: Union[str, "Message", "MessageSegment"],
-    **kwargs: Any,
-):
-    if plugin_config.blockwords_bot:
-        if plugin_config.blockwords_replace is not None:  # 是否带有替换字符
-            if isinstance(message, str):
-                message = blockword_replace(message)
-            elif isinstance(message, Message):
-                new_message = message.copy()
-                new_message.clear()
-                for msg in message:
-                    if isinstance(msg, MessageSegment) and msg.is_text():
-                        new_message += blockword_replace(
-                            msg.get_message_class()(msg).extract_plain_text()
-                        )
-                    else:
-                        new_message.append(msg)
-                message = new_message
-            elif isinstance(message, MessageSegment) and message.is_text():
-                message_class: Type[Message] = message.get_message_class()
-                message = message_class(
-                    blockword_replace(message_class(message).extract_plain_text())
-                )
-            await send(event, message, **kwargs)
-        else:
-            text = message
-            if isinstance(message, Message):
-                text = message.extract_plain_text()
-            elif isinstance(message, MessageSegment) and message.is_text():
-                text = message.get_message_class()(message).extract_plain_text()
-            if isinstance(text, str) and blockword_exists(text):
-                logger.warning(f"屏蔽词触发停止发送消息: {text}")
-                return
-            await send(event, message, **kwargs)
-    else:
-        await send(event, message, **kwargs)
+            plugin_config.blockwords_bot = status
+            await matcher.finish(f"机器人屏蔽词{txt}")
 
 
 @driver.on_bot_connect

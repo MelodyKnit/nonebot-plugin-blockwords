@@ -1,5 +1,4 @@
 import re
-from functools import partial
 from typing import List, Union, Iterable
 
 from jieba import cut
