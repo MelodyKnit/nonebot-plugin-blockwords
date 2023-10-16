@@ -5,7 +5,7 @@ from nonebot.adapters import Event as BaseEvent
 
 from ..config import plugin_config
 from ..check import blockword_exists, blockword_replace
-from ..exception import SendMessage, FinishFilter, StopSendMessage
+from ..exception import StopSendMessage, PauseSendMessage, FinishSendMessage
 from ..typings import Message, BaseMessage, BotSendFilter, BaseMessageSegment
 
 _bot_send_hooks: List[BotSendFilter] = []
@@ -20,9 +20,6 @@ def on_bot_send(func: BotSendFilter) -> BotSendFilter:
         # do something
         return message
     ```
-
-    Returns:
-        BotSendFilter: _description_
     """
     _bot_send_hooks.append(func)
     return func
@@ -44,11 +41,11 @@ async def send_hook(
     for hook in _bot_send_hooks:
         try:
             message = await hook(event, message, **kwargs)
-        except FinishFilter as err:
+        except FinishSendMessage as err:
             return await send(event, err.message, **kwargs)
-        except SendMessage as err:
+        except PauseSendMessage as err:
             await send(event, err.message, **kwargs)
-        except StopSendMessage as err:
+        except StopSendMessage:
             break
         except Exception as err:
             logger.opt(colors=True, exception=err).error(
@@ -60,7 +57,7 @@ async def send_hook(
 
 
 @on_bot_send
-async def blockwords_replace(
+async def _blockwords_replace(
     _: BaseEvent,
     message: Message,
 ) -> Message:
@@ -77,19 +74,20 @@ async def blockwords_replace(
                         msg.get_message_class()(msg).extract_plain_text()
                     )
                 else:
-                    new_message.append(msg)
+                    new_message += msg
             message = new_message
         elif isinstance(message, BaseMessageSegment) and message.is_text():
             message_class: Type[BaseMessage] = message.get_message_class()
             message = message_class(
                 blockword_replace(message_class(message).extract_plain_text())
             )
+        raise FinishSendMessage(message)
     return message
 
 
 @on_bot_send
-async def blockwords_stop(
-    event: BaseEvent,
+async def _blockwords_stop(
+    _: BaseEvent,
     message: Message,
 ) -> Message:
     """屏蔽词过滤器"""
@@ -98,6 +96,7 @@ async def blockwords_stop(
         text = message.extract_plain_text()
     elif isinstance(message, BaseMessageSegment) and message.is_text():
         text = message.get_message_class()(message).extract_plain_text()
+
     if isinstance(text, str) and blockword_exists(text):
         logger.warning(f"屏蔽词触发停止发送消息: {text}")
         raise StopSendMessage
