@@ -11,3 +11,6 @@ blockwords_status = on_command(
     priority=plugin_config.blockwords_priority,
     permission=SUPERUSER,
 )
+
+
+__all__ = ["blockwords_matcher"]
