@@ -60,9 +60,10 @@ def blockword_replace(text: str) -> str:
         raise ValueError("缺少`blockwords_replace`配置项")
     if plugin_config.blockwords_use_jieba:
         word_segmentation = list(cut(text, cut_all=False))
-        if word := find_blockword(word_segmentation):
-            for i, w in enumerate(word_segmentation):  # 使用jieba分词后，替换屏蔽词
-                if w in word:
-                    word_segmentation[i] = replace_text(w)
-        return "".join(word_segmentation)
+        if words := find_blockword(word_segmentation):
+            return "".join(
+                replace_text(word) if word in words else word
+                for word in word_segmentation
+            )
+        return text
     return regex.sub(lambda m: replace_text(m.group(0)), text)  # type: ignore
