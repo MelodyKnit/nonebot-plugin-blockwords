@@ -55,7 +55,7 @@ BLOCKWORDS_REPLACE="*" # 将屏蔽词替换为*
 在`env`中配置`blockwords_user`开启接收用户所发送的消息进行检测
 
 ```env
-blockwords_bot = True  # 开启后机器人发送的消息会被进行检测
+blockwords_user = True  # 开启后机器人发送的消息会被进行检测
 ```
 
 在检测到屏蔽词时会触发到`blockwords_matcher`，可以导入`blockwords_matcher`对触发屏蔽词后进行自定义操作
