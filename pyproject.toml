@@ -23,6 +23,16 @@ isort = "^5.10.1"
 black = "^23.1.0"
 pre-commit = "^3.0.0"
 
+[tool.poetry.group.test.dependencies]
+nonebug = "^0.3.5"
+pytest-asyncio = "^0.21.1"
+nonebot-adapter-console = "^0.4.0"
+
+[[tool.poetry.source]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+priority = "default"
+
 [tool.black]
 line-length = 88
 target-version = ["py38", "py39", "py310", "py311"]

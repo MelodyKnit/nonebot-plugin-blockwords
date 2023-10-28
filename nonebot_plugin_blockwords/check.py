@@ -56,8 +56,6 @@ def blockword_replace(text: str) -> str:
     Returns:
         str: 将屏蔽词替换为指定字符后的文本
     """
-    if plugin_config.blockwords_replace is None:
-        raise ValueError("缺少`blockwords_replace`配置项")
     if plugin_config.blockwords_use_jieba:
         word_segmentation = list(cut(text, cut_all=False))
         if words := find_blockword(word_segmentation):

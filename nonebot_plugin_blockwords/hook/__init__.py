@@ -62,27 +62,27 @@ async def _blockwords_replace(
     message: Message,
 ) -> Message:
     """屏蔽词过滤器"""
-    if plugin_config.blockwords_replace is not None:
-        if isinstance(message, str):
-            message = blockword_replace(message)
-        elif isinstance(message, BaseMessage):
-            new_message = message.copy()
-            new_message.clear()
-            for msg in message:
-                if isinstance(msg, BaseMessageSegment) and msg.is_text():
-                    new_message += blockword_replace(
-                        msg.get_message_class()(msg).extract_plain_text()
-                    )
-                else:
-                    new_message += msg
-            message = new_message
-        elif isinstance(message, BaseMessageSegment) and message.is_text():
-            message_class: Type[BaseMessage] = message.get_message_class()
-            message = message_class(
-                blockword_replace(message_class(message).extract_plain_text())
-            )
-        raise FinishSendMessage(message)
-    return message
+    if plugin_config.blockwords_replace is None:
+        return message
+    if isinstance(message, str):
+        message = blockword_replace(message)
+    elif isinstance(message, BaseMessage):
+        new_message = message.copy()
+        new_message.clear()
+        for msg in message:
+            if isinstance(msg, BaseMessageSegment) and msg.is_text():
+                new_message += blockword_replace(
+                    msg.get_message_class()(msg).extract_plain_text()
+                )
+            else:
+                new_message += msg
+        message = new_message
+    elif isinstance(message, BaseMessageSegment) and message.is_text():
+        message_class: Type[BaseMessage] = message.get_message_class()
+        message = message_class(
+            blockword_replace(message_class(message).extract_plain_text())
+        )
+    raise FinishSendMessage(message)
 
 
 @on_bot_send

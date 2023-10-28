@@ -1,13 +1,14 @@
 from functools import partial
 
 from nonebot.log import logger
+from nonebot.typing import T_State
 from nonebot.plugin import PluginMetadata
 from nonebot.internal.matcher import Matcher
 from nonebot.adapters import Bot, Event, Message
 from nonebot.params import CommandArg, CommandStart, EventPlainText
 
 from .hook import send_hook
-from .check import blockword_exists
+from .check import find_blockword
 from .config import Config, driver, plugin_config
 from .matcher import blockwords_status, blockwords_matcher
 
@@ -15,10 +16,12 @@ from .matcher import blockwords_status, blockwords_matcher
 @blockwords_matcher.handle()
 async def _(
     matcher: Matcher,
+    state: T_State,
     event: Event,
     text: str = EventPlainText(),
 ):
-    if plugin_config.blockwords_user and blockword_exists(text):
+    if plugin_config.blockwords_user and (blockwords := find_blockword(text)):
+        state["_blockwords"] = blockwords
         user_id = event.get_user_id()
         logger.warning(f"[{user_id}] 用户触发屏蔽词: {text}")
         if plugin_config.blockwords_stop_propagation:
