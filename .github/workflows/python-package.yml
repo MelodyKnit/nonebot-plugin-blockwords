@@ -33,7 +33,7 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Install prerequisites
         run: |
-          poetry install
+          python -m poetry install
       - name: Test with pytest
         run: |
-          pytest
+          python -m pytest -p no:warnings
