@@ -34,4 +34,4 @@ jobs:
       - name: Test with pytest
         run: |
           poetry install
-          pytest -p no:warnings
+          poetry run pytest -p no:warnings
