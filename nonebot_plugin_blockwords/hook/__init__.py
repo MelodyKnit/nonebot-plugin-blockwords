@@ -1,59 +1,13 @@
-from typing import Any, List, Type
+from typing import Type
 
 from nonebot.log import logger
 from nonebot.adapters import Event as BaseEvent
 
 from ..config import plugin_config
 from ..check import blockword_exists, blockword_replace
-from ..exception import StopSendMessage, PauseSendMessage, FinishSendMessage
-from ..typings import Message, BaseMessage, BotSendFilter, BaseMessageSegment
-
-_bot_send_hooks: List[BotSendFilter] = []
-
-
-def on_bot_send(func: BotSendFilter) -> BotSendFilter:
-    """注册一个 bot send hook
-
-    ```python
-    @on_bot_send
-    async def _(event: Event, message: Message) -> Message:
-        # do something
-        return message
-    ```
-    """
-    _bot_send_hooks.append(func)
-    return func
-
-
-def clear_send_hook() -> None:
-    """清空所有 bot send hook"""
-    _bot_send_hooks.clear()
-
-
-async def send_hook(
-    send,
-    event: BaseEvent,
-    message: Message,
-    **kwargs: Any,
-):
-    if not plugin_config.blockwords_bot:
-        return await send(event, message, **kwargs)
-    for hook in _bot_send_hooks:
-        try:
-            message = await hook(event, message, **kwargs)
-        except FinishSendMessage as err:
-            return await send(event, err.message, **kwargs)
-        except PauseSendMessage as err:
-            await send(event, err.message, **kwargs)
-        except StopSendMessage:
-            break
-        except Exception as err:
-            logger.opt(colors=True, exception=err).error(
-                "<r><bg #f8bbd0>Error in bot send hook</bg #f8bbd0></r>"
-            )
-            raise err
-    else:
-        return await send(event, message, **kwargs)
+from .bot import send_hook, on_bot_send, clear_send_hook
+from ..exception import StopSendMessage, FinishSendMessage
+from ..typings import Message, BaseMessage, BaseMessageSegment
 
 
 @on_bot_send
@@ -63,7 +17,7 @@ async def _blockwords_replace(
 ) -> Message:
     """屏蔽词过滤器"""
     if plugin_config.blockwords_replace is None:
-        return message
+        return message  # 会将消息返回到下一个过滤器
     if isinstance(message, str):
         message = blockword_replace(message)
     elif isinstance(message, BaseMessage):
@@ -82,7 +36,7 @@ async def _blockwords_replace(
         message = message_class(
             blockword_replace(message_class(message).extract_plain_text())
         )
-    raise FinishSendMessage(message)
+    raise FinishSendMessage(message)    # 将过滤后的消息让机器人发送出去
 
 
 @on_bot_send
@@ -101,3 +55,10 @@ async def _blockwords_stop(
         logger.warning(f"屏蔽词触发停止发送消息: {text}")
         raise StopSendMessage
     return message
+
+
+__all__ = [
+    "send_hook",
+    "on_bot_send",
+    "clear_send_hook",
+]

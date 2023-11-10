@@ -3,10 +3,10 @@ from typing import List, Union, Iterable
 
 from jieba import cut
 
-from .utils import get_blockword
 from .config import plugin_config
+from .utils import get_blockwords
 
-blockwords = get_blockword()
+blockwords = get_blockwords()
 pattern = "|".join(re.escape(w) for w in blockwords)
 regex = re.compile(rf"(?:{pattern})")
 
