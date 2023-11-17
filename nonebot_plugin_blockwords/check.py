@@ -42,9 +42,11 @@ def blockword_exists(text: str) -> bool:
     Returns:
         bool: 是否存在
     """
-    if plugin_config.blockwords_use_jieba:
-        return bool(find_blockword(text))
-    return bool(regex.search(text))
+    if blockwords:
+        if plugin_config.blockwords_use_jieba:
+            return bool(find_blockword(text))
+        return bool(regex.search(text))
+    return False
 
 
 def blockword_replace(text: str) -> str:
