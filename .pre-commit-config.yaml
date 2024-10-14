@@ -3,11 +3,11 @@ repos:
     rev: 5.13.2
     hooks:
       - id: isort
-        stages: [commit]
+        stages: [pre-commit]
 
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         types_or: [javascript, jsx, ts, tsx, markdown, yaml, json]
-        stages: [commit]
+        stages: [pre-commit]
