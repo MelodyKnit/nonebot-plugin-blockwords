@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 10.0.0b1
     hooks:
       - id: isort
         stages: [pre-commit]
