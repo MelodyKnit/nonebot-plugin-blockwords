@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
+from genericpath import isdir
 from typing import List, Optional
 
-from genericpath import isdir
 from nonebot.log import logger
 
 from .config import plugin_config
